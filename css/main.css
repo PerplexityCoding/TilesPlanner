@@ -122,28 +122,38 @@ body {
 .leftContent .tiles {
     list-style: none;
     display: grid;
-    grid-template-rows: repeat(3, 60px);
+    grid-template-rows: repeat(3, 100px);
     grid-auto-flow: column;
     /*grid-gap: 1px 1px;*/
-    grid-auto-columns: 60px;
+    grid-auto-columns: 100px;
     background: white;
     padding: 0;
 }
 
+.designerMod .leftContent .tiles li {
+    outline: 1px dashed grey;
+}
+
 .leftContent .tiles img {
-    width: 60px;
-    height: 60px;
+    width: 100px;
+    height: 100px;
 }
 
 .rightContent {
-    width: 200px;
+    width: 250px;
     background-color: #cacaca;
 }
 
 .rightContent .tiles {
     list-style: none;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-auto-flow: row;
+    grid-auto-rows: 100px;
+    grid-template-columns: repeat(2, 100px);
+    grid-row-gap: 1rem;
+    justify-content: space-evenly;
+    margin-top: 10px;
+    padding: 0;
 }
 
 .rightContent .tiles li {
@@ -151,8 +161,8 @@ body {
 }
 
 .item {
-    width: 60px;
-    height: 60px;
+    width: 100px;
+    height: 100px;
 }
 
 [v-cloak] {

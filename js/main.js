@@ -1,38 +1,5 @@
 (() => {
 
-    /*let $tiles = $('.leftContent .tiles');
-
-    function dropGrid() {
-        $tiles.on('dragover', (e) => {
-            e.preventDefault(); // Annule l'interdiction de drop
-        });
-
-        $tiles.on('drop', (e) => {
-            let $target = $(e.target);
-            let $newItem = createItem(e.originalEvent.dataTransfer.getData('text/html'));
-            e.preventDefault();
-            if (e.target == $tiles[0]) {
-                $tiles.append($newItem);
-            } else if ($target.hasClass('item')) {
-                $target.attr('src', $newItem.find('img').attr('src'));
-            }
-            save();
-        });
-
-        $('.rightContent .item')
-            .on('dragstart', (e) => {
-                e.originalEvent.dataTransfer.setData('text/html', e.target.outerHTML);
-            })
-
-            .on('click', (e) => {
-                $tiles.append(createItem(e.target.outerHTML));
-                save();
-            })
-    }
-
-    load();
-    dropGrid();*/
-
     const TileComponent = Vue.component('tile', {
         props: ['tile'],
         template: `<img class="item" :src="imgHref" v-on:click="click" v-on:dragstart="dragstart" draggable="true"></img>`,
@@ -41,13 +8,12 @@
                 this.$emit('tile-click', this.tile);
             },
             dragstart(e) {
-                console.log(e);
                 e.dataTransfer.setData('tile', JSON.stringify(this.tile))
             }
         },
         computed: {
             imgHref() {
-                return `img/${this.tile.name}.jpg`;
+                return `img/${this.tile.name}.png`;
             }
         }
     });
@@ -63,13 +29,11 @@
                    </li>`,
         methods: {
             dblclick() {
-                console.log('test');
                 this.$emit('grid-tile-dblclick', this.gridTile);
             },
             drop(e) {
                 const tile = JSON.parse(e.dataTransfer.getData('tile'));
-                //this.gridTile.tile = tile;
-                Vue.set(this.gridTile, 'tile', tile);
+                this.$emit('tile-drop-on-grid-tile', this.gridTile, tile);
             },
             dragover(e) {
                 e.preventDefault();
@@ -78,7 +42,6 @@
         computed: {
             style() {
                 return {
-                    "border": "1px solid red",
                     "grid-column": this.gridTile.column,
                     "grid-row": this.gridTile.row
                 };
@@ -207,6 +170,10 @@
                 Vue.set(gridTile, 'tile', tile);
                 this.save();
             },
+            dropTile(gridTile, tile) {
+                Vue.set(gridTile, 'tile', tile);
+                this.save();
+            },
             guid() {
                 function s4() {
                     return Math.floor((1 + Math.random()) * 0x10000)
@@ -215,6 +182,9 @@
                 }
                 return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
             },
+            toggleDesignerMod() {
+                this.designerMod = !this.designerMod;
+            }
         },
         data: {
             tilesId: 0,
@@ -223,16 +193,38 @@
             columns: 10,
             selectedWorkspace: '',
             workspaces: [],
+            designerMod: true,
             board: {
                 gridTiles: []
             },
             toolBox: {
                 tiles: [
                     {
-                        name: 'tile1'
+                        name: 'carreblanc'
                     },
                     {
-                        name: 'tile2'
+                        name: 'carrenoir'
+                    },
+                    {
+                        name: 'carrenoirblue'
+                    },
+                    {
+                        name: 'cercle'
+                    },
+                    {
+                        name: 'etoilecarre'
+                    },
+                    {
+                        name: 'flacon'
+                    },
+                    {
+                        name: 'flaconneige'
+                    },
+                    {
+                        name: 'fleur'
+                    },
+                    {
+                        name: 'fleurexotique'
                     }
                 ]
             }
