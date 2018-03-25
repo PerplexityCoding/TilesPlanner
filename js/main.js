@@ -2,13 +2,22 @@
 
     const TileComponent = Vue.component('tile', {
         props: ['tile'],
-        template: `<img class="item" :src="imgHref" v-on:click="click" v-on:dragstart="dragstart" draggable="true"></img>`,
+        template: `
+            <div class="tileItem">
+                <span class="tileCount">{{tile.count}}</span>
+                <img class="item" :src="imgHref" v-on:click="click" v-on:dragstart="dragstart" draggable="true"></img>
+            </div>
+        `,
         methods: {
             click() {
-                this.$emit('tile-click', this.tile);
+                this.$emit('tile-click', {
+                    name: this.tile.name
+                });
             },
             dragstart(e) {
-                e.dataTransfer.setData('tile', JSON.stringify(this.tile))
+                e.dataTransfer.setData('tile', JSON.stringify({
+                    name: this.tile.name
+                }))
             }
         },
         computed: {
@@ -100,6 +109,7 @@
                 } else {
                     this.resetBoard();
                 }
+                this.updateCountByTiles();
             },
             loadWorkspaces() {
                 let keys = Object.keys(localStorage);
@@ -164,15 +174,18 @@
             deleteTile(gridTile) {
                 Vue.set(gridTile, 'tile', null);
                 this.save();
+                this.updateCountByTiles();
             },
             addTile(tile) {
                 let gridTile = this.getFirstEmptyTile();
                 Vue.set(gridTile, 'tile', tile);
                 this.save();
+                this.updateCountByTiles();
             },
             dropTile(gridTile, tile) {
                 Vue.set(gridTile, 'tile', tile);
                 this.save();
+                this.updateCountByTiles();
             },
             guid() {
                 function s4() {
@@ -184,6 +197,23 @@
             },
             toggleDesignerMod() {
                 this.designerMod = !this.designerMod;
+            },
+            updateCountByTiles() {
+                let countByTiles = {};
+                for (let gridTiles of this.board.gridTiles) {
+                    let tile = gridTiles.tile;
+                    if (tile) {
+                        let countByTile = countByTiles[tile.name];
+                        countByTiles[tile.name] = countByTile ? countByTile + 1 : 1;
+                    }
+                }
+
+                for (let toolBoxTile of this.toolBox.tiles) {
+                    let count = countByTiles[toolBoxTile.name] || 0;
+                    if (toolBoxTile.count != count) {
+                        Vue.set(toolBoxTile, 'count', count);
+                    }
+                }
             }
         },
         data: {
