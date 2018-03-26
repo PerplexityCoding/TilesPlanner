@@ -23,8 +23,16 @@
         },
         computed: {
             imgHref() {
-                return require(`../assets/img/${this.tile.name}.png`);
+                return require(`./assets/img/${this.tile.name}.png`);
             }
         }
     };
 </script>
+
+
+<style>
+    .item {
+        width: 100px;
+        height: 100px;
+    }
+</style>

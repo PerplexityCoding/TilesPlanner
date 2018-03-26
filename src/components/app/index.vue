@@ -33,8 +33,8 @@
 </template>
 
 <script>
-    import GridTile from './GridTile.vue';
-    import Tile from './Tile.vue';
+    import GridTile from '../grid-tile';
+    import Tile from '../tile';
     import Vue from 'vue';
 
     export default {
@@ -97,7 +97,7 @@
             loadWorkspaces() {
                 let keys = Object.keys(localStorage);
                 if (keys) {
-                    this.workspaces = keys.map((s) => {
+                    this.workspaces = keys.filter(s => s.startsWith('workspace')).map((s) => {
                         return s.split('workspace-')[1];
                     });
                 }
