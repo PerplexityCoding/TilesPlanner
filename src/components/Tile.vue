@@ -1,12 +1,13 @@
 <template>
     <div class="tileItem">
         <span class="tileCount">{{tile.count}}</span>
-        <img class="item" :src="imgHref" v-on:click="click" v-on:dragstart="dragstart" draggable="true"></img>
+        <img class="item" :src="imgHref" v-on:click="click" v-on:dragstart="dragstart" draggable="true" />
     </div>
 </template>
 
 <script>
-    module.exports = {
+    export default {
+        name: 'tile',
         props: ['tile'],
         methods: {
             click() {
@@ -22,7 +23,7 @@
         },
         computed: {
             imgHref() {
-                return `img/${this.tile.name}.png`;
+                return require(`../assets/img/${this.tile.name}.png`);
             }
         }
     };

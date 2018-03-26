@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html class="no-js" lang="">
     <head>
         <meta charset="utf-8">
@@ -11,42 +11,10 @@
         <link rel="apple-touch-icon" href="icon.png">
         <!-- Place favicon.ico in the root directory -->
 
-        <link rel="stylesheet" href="src/css/normalize.css">
-        <link rel="stylesheet" href="src/css/main.css">
+        <link rel="stylesheet" href="./assets/css/normalize.css">
+        <link rel="stylesheet" href="./assets/css/main.css">
     </head>
     <body>
-        <section id="app" class="mainContent" v-cloak v-bind:class="{ designerMod: designerMod }">
-            <section class="leftContent">
-                <section>
-                    <select v-model="selectedWorkspace" v-on:change="selectWorkspace">
-                        <option v-for="workspace in workspaces">{{workspace}}</option>
-                    </select>
-
-                    <button v-on:click="newWorkspace">new</button>
-                    <button v-on:click="deleteWorkspace">delete</button>
-                </section>
-
-                <ul class="tiles">
-                    <grid-tile v-for="gridTile in board.gridTiles" :grid-tile="gridTile"
-                               v-on:grid-tile-dblclick="deleteTile"
-                               v-on:tile-drop-on-grid-tile="dropTile"
-                    ></grid-tile>
-                </ul>
-            </section>
-
-            <section class="rightContent">
-                <button v-on:click="toggleDesignerMod">
-                    Designer Mod: {{designerMod}}
-                </button>
-
-                <hr />
-
-                <ul class="tiles">
-                    <tile v-for="tile in toolBox.tiles" v-on:tile-click="addTile" :tile="tile"></tile>
-                </ul>
-            </section>
-        </section>
-
-        <script src="dist/bundle.js"></script>
+        <div id="app"></div>
     </body>
 </html>
