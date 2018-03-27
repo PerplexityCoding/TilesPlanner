@@ -30,9 +30,29 @@
 </script>
 
 
-<style>
+<style scoped>
     .item {
         width: 100px;
         height: 100px;
+    }
+
+    .tileCount {
+        position: absolute;
+        z-index: 21;
+        height: 1rem;
+        width: 1rem;
+        text-align: center;
+        background: #ffd04e;
+        line-height: 1rem;
+        border-radius: 25px;
+        top: 0.2rem;
+        right: 0.2rem;
+        display: none;
+    }
+</style>
+
+<style>
+    .designerMod .tileCount {
+        display: block;
     }
 </style>

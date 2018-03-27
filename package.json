@@ -1,0 +1,53 @@
+{
+    "name": "tiles-planner",
+    "version": "1.0.0",
+    "description": "",
+    "private": true,
+    "scripts": {
+        "deploy": "git subtree push --prefix dist origin gh-pages",
+        "serve": "vue-cli-service serve",
+        "build": "vue-cli-service build",
+        "lint": "vue-cli-service lint"
+    },
+    "dependencies": {
+        "vue": "^2.5.13"
+    },
+    "devDependencies": {
+        "@vue/cli-plugin-babel": "^3.0.0-beta.6",
+        "@vue/cli-plugin-eslint": "^3.0.0-beta.6",
+        "@vue/cli-service": "^3.0.0-beta.6",
+        "vue-template-compiler": "^2.5.13"
+    },
+    "babel": {
+        "presets": [
+            "@vue/app"
+        ]
+    },
+    "eslintConfig": {
+        "root": true,
+        "extends": [
+            "plugin:vue/essential",
+            "eslint:recommended"
+        ]
+    },
+    "postcss": {
+        "plugins": {
+            "autoprefixer": {}
+        }
+    },
+    "browserslist": [
+        "> 1%",
+        "last 2 versions",
+        "not ie <= 8"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/fanatic84/TilesPlanner.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/fanatic84/TilesPlanner/issues"
+    },
+    "homepage": "https://github.com/fanatic84/TilesPlanner#readme"
+}
