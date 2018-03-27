@@ -1,7 +1,7 @@
 <template>
     <div class="tileItem">
         <span class="tileCount">{{tile.count}}</span>
-        <img class="item" :src="imgHref" v-on:click="click" v-on:dragstart="dragstart" draggable="true" />
+        <img class="item" :src="imgHref" v-on:click="click" v-on:dragstart="dragstart" draggable="true"/>
     </div>
 </template>
 

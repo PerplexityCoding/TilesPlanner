@@ -3,10 +3,11 @@
         <section class="leftContent">
             <section>
                 <select v-model="selectedWorkspace" v-on:change="selectWorkspace">
-                    <option v-for="workspace in workspaces">{{workspace}}</option>
+                    <option v-for="workspace in workspaces" v-bind:value="workspace.id">{{workspace.name}}</option>
                 </select>
 
-                <button v-on:click="newWorkspace">new</button>
+                <button v-on:click="showNewModal=true">new</button>
+                <button v-on:click="showRenameModal=true">rename</button>
                 <button v-on:click="deleteWorkspace">delete</button>
             </section>
 
@@ -29,26 +30,62 @@
                 <tile v-for="tile in toolBox.tiles" v-on:tile-click="addTile" :tile="tile"></tile>
             </ul>
         </section>
+
+        <modal v-if="showNewModal">
+            <h3 slot="header">
+                New tiles board
+            </h3>
+
+            <section slot="body">
+                To create new board !
+                <label for="board-name-new">Board name:</label>
+                <input id="board-name-new" type="text" v-model="newBoardName" />
+            </section>
+
+            <section slot="footer">
+                <button @click="closeNewWorkspaceModal"> Create </button>
+            </section>
+        </modal>
+
+        <modal v-if="showRenameModal">
+            <h3 slot="header">
+                Rename board
+            </h3>
+
+            <section slot="body">
+                Rename the board
+                <label for="board-name-rename">Board name:</label>
+                <input id="board-name-rename" type="text" v-model="newBoardName" />
+            </section>
+
+            <section slot="footer">
+                <button @click="closeRenameWorkspaceModal"> Close </button>
+            </section>
+        </modal>
+
     </section>
 </template>
 
 <script>
     import GridTile from '../grid-tile';
     import Tile from '../tile';
+    import Modal from '../modal'
     import Vue from 'vue';
 
     export default {
         name: 'App',
         components: {
             GridTile,
-            Tile
+            Tile,
+            Modal
         },
         created() {
-            this.load();
+            this.loadWorkspaces();
+            this.loadWorkspace();
             if (!this.board.gridTiles) {
                 this.initGridTiles();
             }
-            this.loadWorkspaces();
+
         },
         methods: {
             getWorkspaceIdFromHash(create) {
@@ -62,29 +99,19 @@
                 return null;
             },
             save() {
-                let workspaceId = this.getWorkspaceIdFromHash(true);
-                this.selectWorkspaceId(workspaceId);
-                localStorage.setItem('workspace-' + workspaceId, JSON.stringify({
-                    gridTiles: this.board.gridTiles.map((gridTile) => {
-                        return {
-                            tile: gridTile.tile,
-                            column: gridTile.column,
-                            row: gridTile.row
-                        };
-                    })
-                }));
+                localStorage.setItem('workspaces', JSON.stringify(this.workspaces));
             },
             resetBoard() {
                 this.board = {
                     gridTiles: []
                 };
             },
-            load() {
+            loadWorkspace() {
                 let workspaceId = this.getWorkspaceIdFromHash();
                 if (workspaceId) {
-                    let workspace = localStorage.getItem('workspace-' + workspaceId);
+                    let workspace = this.findWorkspaceById(workspaceId);
                     if (workspace) {
-                        this.board = JSON.parse(workspace);
+                        this.board = workspace.data;
                     } else {
                         this.resetBoard();
                     }
@@ -95,12 +122,34 @@
                 this.updateCountByTiles();
             },
             loadWorkspaces() {
-                let keys = Object.keys(localStorage);
-                if (keys) {
-                    this.workspaces = keys.filter(s => s.startsWith('workspace')).map((s) => {
-                        return s.split('workspace-')[1];
-                    });
+                let workspaces = localStorage.getItem('workspaces');
+
+                if (workspaces) {
+                    this.workspaces = JSON.parse(workspaces);
+                } else { // old workspaces
+                    let keys = Object.keys(localStorage);
+                    if (keys) {
+                        this.workspaces = keys.filter(s => s.startsWith('workspace-')).map((s) => {
+                            let id = s.split('workspace-')[1];
+                            let workspaceData = JSON.parse(localStorage.getItem(s));
+                            return {
+                                id: id,
+                                name: id,
+                                data: workspaceData
+                            };
+                        });
+                    }
                 }
+            },
+            findWorkspaceById(workspaceId) {
+                let result = this.workspaces.filter((o) => {return o.id == workspaceId});
+                if (result && result.length > 0) {
+                    return result[0];
+                }
+                return null;
+            },
+            findWorkspaceIdxById(workspaceId) {
+                return this.workspaces.map((o) => {return o.id}).indexOf(workspaceId);
             },
             selectWorkspaceId(workspaceId) {
                 this.selectedWorkspace = workspaceId;
@@ -108,33 +157,48 @@
             },
             selectWorkspace() {
                 this.selectWorkspaceId(this.selectedWorkspace);
-                this.load();
+                this.loadWorkspace();
             },
-            newWorkspace() {
+            openNewWorkspaceModal() {
+                this.showNewModal = true;
+            },
+            closeNewWorkspaceModal() {
                 let newWorkspaceId = this.guid();
 
-                this.workspaces.push(newWorkspaceId);
+                this.workspaces.push({
+                    id: newWorkspaceId,
+                    name: this.newBoardName,
+                    data: {
+                        gridTiles: this.createGridTiles()
+                    }
+                });
                 this.selectWorkspaceId(newWorkspaceId);
 
-                this.load();
+                this.loadWorkspace();
                 this.initGridTiles();
                 this.save();
+
+                this.showNewModal = false;
+            },
+            closeRenameWorkspaceModal() {
+                let worskpace = this.findWorkspaceById(this.selectedWorkspace);
+                worskpace.name = this.newBoardName;
+
+                this.showRenameModal = false;
             },
             deleteWorkspace() {
-                let currentIdx = this.workspaces.indexOf(this.selectedWorkspace);
+                let currentIdx = this.findWorkspaceIdxById(this.selectedWorkspace);
 
                 this.workspaces.splice(currentIdx, 1);
-                localStorage.removeItem('workspace-' + this.selectedWorkspace);
-
                 if (this.workspaces.length > 0) {
-                    this.selectWorkspaceId(this.workspaces[currentIdx > 0 ? currentIdx - 1 : 0]);
+                    this.selectWorkspaceId(this.workspaces[currentIdx > 0 ? currentIdx - 1 : 0].id);
                 } else {
                     this.selectWorkspaceId('');
                 }
 
-                this.load();
+                this.loadWorkspace();
             },
-            initGridTiles() {
+            createGridTiles() {
                 let gridTiles = [];
                 for (let j = 1; j <= this.columns; j++) {
                     for (let i = 1; i <= this.rows; i++) {
@@ -145,7 +209,10 @@
                         });
                     }
                 }
-                this.board.gridTiles = gridTiles;
+                return gridTiles;
+            },
+            initGridTiles() {
+                this.board.gridTiles = this.createGridTiles();
             },
             getFirstEmptyTile() {
                 for (let gridTile of this.board.gridTiles) {
@@ -202,6 +269,9 @@
         },
         data() {
             return {
+                showNewModal: false,
+                showRenameModal: false,
+                newBoardName: '',
                 tilesId: 0,
                 gridTilesId: 0,
                 rows: 3,
@@ -301,6 +371,11 @@
     .rightContent .tiles li {
         padding: 5px;
     }
+
+    .rightContent .tileItem {
+        position: relative;
+    }
+
 </style>
 
 <style>
